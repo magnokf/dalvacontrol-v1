@@ -1,0 +1,32 @@
+{
+  "name": "magnokf/DalvaControl",
+  "description": "Gestão de Alunos e Resposáveis",
+  "minimum-stability": "stable",
+  "authors": [
+    {
+      "name": "Magno Kelly",
+      "email": "webmaster@dmrgames.com",
+      "homepage": "https://www.dmrgames.com",
+      "role": "Dev"
+    }
+  ],
+  "config": {
+    "vendor-dir": "vendor"
+  },
+  "autoload": {
+    "psr-4": {
+      "Source\\": "source/"
+    },
+    "files": [
+      "source/Boot/Config.php"
+
+
+    ]
+  },
+  "require": {
+    "php": "^7.1",
+    "ext-pdo": "^7.1",
+    "ext-json": "*",
+    "coffeecode/datalayer": "^1.0"
+  }
+}
