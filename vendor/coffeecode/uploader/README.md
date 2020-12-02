@@ -33,7 +33,7 @@ CoffeeCode é um conjunto de pequenos e otimizados componentes PHP para tarefas 
 Uploader is available via Composer:
 
 ```bash
-"coffeecode/uploader": "^1.0"
+"coffeecode/uploader": "1.0.*"
 ```
 
 or run
@@ -117,6 +117,23 @@ if ($_FILES) {
     } catch (Exception $e) {
         echo "<p>(!) {$e->getMessage()}</p>";
     }
+}
+```
+
+#### Upload Multiple
+
+```php
+require __DIR__ . "/../vendor/autoload.php";
+
+$image = new CoffeeCode\Uploader\Image("uploads", "images");
+
+try {
+    foreach ($image->multiple("file", $_FILES) as $file) {
+        $image->upload($file, "image-" . $file["name"], 1200);
+    }
+    echo "Success!";
+} catch (Exception $exception) {
+    echo "<p>(!) {$e->getMessage()}</p>";
 }
 ```
 

@@ -2,6 +2,10 @@
 
 namespace CoffeeCode\Cropper;
 
+use Exception;
+use WebPConvert\Convert\Exceptions\ConversionFailedException;
+use WebPConvert\WebPConvert;
+
 /**
  * Class CoffeeCode Cropper
  *
@@ -13,9 +17,6 @@ class Cropper
     /** @var string */
     private $cachePath;
 
-    /** @var array */
-    private $cacheSize;
-
     /** @var string */
     private $imagePath;
 
@@ -25,12 +26,17 @@ class Cropper
     /** @var string */
     private $imageMime;
 
-    /** @var string */
-    private $imageInfo;
+    /** @var int */
+    private $quality;
+
+    /** @var int */
+    private $compressor;
+
+    /**@var bool */
+    private $webP;
 
     /**
      * Allow jpg and png to thumb and cache generate
-     *
      * @var array allowed media types
      */
     private static $allowedExt = ['image/jpeg', "image/png"];
@@ -39,18 +45,21 @@ class Cropper
      * Cropper constructor.
      *
      * @param string $cachePath
-     * @param int $jpgQuality
-     * @param int $pngCompressor
-     * @throws \Exception
+     * @param int $quality
+     * @param int $compressor
+     * @param bool $webP
+     * @throws Exception
      */
-    public function __construct(string $cachePath, int $jpgQuality = 75, int $pngCompressor = 5)
+    public function __construct(string $cachePath, int $quality = 75, int $compressor = 5, bool $webP = false)
     {
         $this->cachePath = $cachePath;
-        $this->cacheSize = [$jpgQuality, $pngCompressor];
+        $this->quality = $quality;
+        $this->compressor = $compressor;
+        $this->webP = $webP;
 
         if (!file_exists($this->cachePath) || !is_dir($this->cachePath)) {
-            if (!mkdir($this->cachePath, 0755)) {
-                throw new \Exception("Could not create cache folder");
+            if (!mkdir($this->cachePath, 0755, true)) {
+                throw new Exception("Could not create cache folder");
             }
         }
     }
@@ -70,16 +79,32 @@ class Cropper
         }
 
         $this->imagePath = $imagePath;
+        $this->imageName = $this->name($this->imagePath, $width, $height);
         $this->imageMime = mime_content_type($this->imagePath);
-        $this->imageInfo = pathinfo($this->imagePath);
 
         if (!in_array($this->imageMime, self::$allowedExt)) {
             return "Not a valid JPG or PNG image";
         }
 
-        $this->imageName = $this->name($this->imagePath, $width, $height);
-        if (file_exists("{$this->cachePath}/{$this->imageName}") && is_file("{$this->cachePath}/{$this->imageName}")) {
-            return "{$this->cachePath}/{$this->imageName}";
+        return $this->image($width, $height);
+    }
+
+    /**
+     * @param int $width
+     * @param int|null $height
+     * @return string|null
+     */
+    private function image(int $width, int $height = null): ?string
+    {
+        $imageWebP = "{$this->cachePath}/{$this->imageName}.webp";
+        $imageExt = "{$this->cachePath}/{$this->imageName}." . pathinfo($this->imagePath)['extension'];
+
+        if ($this->webP && file_exists($imageWebP) && is_file($imageWebP)) {
+            return $imageWebP;
+        }
+
+        if (file_exists($imageExt) && is_file($imageExt)) {
+            return $imageExt;
         }
 
         return $this->imageCache($width, $height);
@@ -87,6 +112,8 @@ class Cropper
 
     /**
      * @param string $name
+     * @param int $width
+     * @param int $height
      * @return string
      */
     protected function name(string $name, int $width = null, int $height = null): string
@@ -98,11 +125,10 @@ class Cropper
         $name = str_replace(["-----", "----", "---", "--"], "-", str_replace(" ", "-", $trimName));
 
         $hash = $this->hash($this->imagePath);
-        $ext = ($this->imageMime == "image/jpeg" ? ".jpg" : ".png");
         $widthName = ($width ? "-{$width}" : "");
         $heightName = ($height ? "x{$height}" : "");
 
-        return "{$name}{$widthName}{$heightName}-{$hash}{$ext}";
+        return "{$name}{$widthName}{$heightName}-{$hash}";
     }
 
     /**
@@ -196,13 +222,18 @@ class Cropper
     {
         $thumb = imagecreatetruecolor($width, $height);
         $source = imagecreatefromjpeg($this->imagePath);
-        imagecopyresized($thumb, $source, 0, 0, $src_x, $src_y, $width, $height, $src_w, $src_h);
-        imagejpeg($thumb, "{$this->cachePath}/{$this->imageName}", $this->cacheSize[0]);
+
+        imagecopyresampled($thumb, $source, 0, 0, $src_x, $src_y, $width, $height, $src_w, $src_h);
+        imagejpeg($thumb, "{$this->cachePath}/{$this->imageName}.jpg", $this->quality);
 
         imagedestroy($thumb);
         imagedestroy($source);
 
-        return "{$this->cachePath}/{$this->imageName}";
+        if ($this->webP) {
+            return $this->toWebP("{$this->cachePath}/{$this->imageName}.jpg");
+        }
+
+        return "{$this->cachePath}/{$this->imageName}.jpg";
     }
 
     /**
@@ -221,12 +252,37 @@ class Cropper
 
         imagealphablending($thumb, false);
         imagesavealpha($thumb, true);
-        imagecopyresized($thumb, $source, 0, 0, $src_x, $src_y, $width, $height, $src_w, $src_h);
-        imagepng($thumb, "{$this->cachePath}/{$this->imageName}", $this->cacheSize[1]);
+        imagecopyresampled($thumb, $source, 0, 0, $src_x, $src_y, $width, $height, $src_w, $src_h);
+        imagepng($thumb, "{$this->cachePath}/{$this->imageName}.png", $this->compressor);
 
         imagedestroy($thumb);
         imagedestroy($source);
 
-        return "{$this->cachePath}/{$this->imageName}";
+        if ($this->webP) {
+            return $this->toWebP("{$this->cachePath}/{$this->imageName}.png");
+        }
+
+        return "{$this->cachePath}/{$this->imageName}.png";
+    }
+
+    /**
+     * @param string $image
+     * @param bool $unlinkImage
+     * @return string
+     */
+    public function toWebP(string $image, $unlinkImage = true): string
+    {
+        try {
+            $webPConverted = pathinfo($image)["dirname"] . "/" . pathinfo($image)["filename"] . ".webp";
+            WebPConvert::convert($image, $webPConverted, ["default-quality" => $this->quality]);
+
+            if ($unlinkImage) {
+                unlink($image);
+            }
+
+            return $webPConverted;
+        } catch (ConversionFailedException $exception) {
+            return $image;
+        }
     }
 }

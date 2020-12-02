@@ -15,13 +15,17 @@ class ComposerStaticInit80e98d45efb65b4a54a9e5631eab57ba
         'bdc465a053da7f7ddb072631f6d41d45' => __DIR__ . '/..' . '/league/plates/src/Extension/LayoutSections/layout-sections.php',
         'afa76803f24616d7599be3b7b0846adc' => __DIR__ . '/..' . '/league/plates/src/Extension/Folders/folders.php',
         '16c5be35e32c6cf916d875518b909210' => __DIR__ . '/..' . '/league/plates/src/Util/util.php',
-        'cf2ca5af50b51f8ffa8fc0fd8b9716fd' => __DIR__ . '/../..' . '/source/Boot/Config.php',
-        '4067677080b8d5bce02915cc6a32394c' => __DIR__ . '/../..' . '/source/Boot/Helpers.php',
-        'a0423e6d78ae405e5251e38bd73ef171' => __DIR__ . '/../..' . '/source/Boot/Minify/Web.php',
-        'bf72ed77a0b0d620dde74e10bda5c75b' => __DIR__ . '/../..' . '/source/Boot/Minify/App.php',
+        'e2c955e511e5f564aa0f014c8c692a9b' => __DIR__ . '/../..' . '/source/Boot/Config.php',
+        '49bd436aa3d368dd09f47c18258486c5' => __DIR__ . '/../..' . '/source/Boot/Helpers.php',
+        'a0c874440c48d1d8fde53f3f62436550' => __DIR__ . '/../..' . '/source/Boot/Minify/Web.php',
+        '7c952a5a2a5ce3f1c61dcf65702b62fd' => __DIR__ . '/../..' . '/source/Boot/Minify/App.php',
     );
 
     public static $prefixLengthsPsr4 = array (
+        'W' => 
+        array (
+            'WebPConvert\\' => 12,
+        ),
         'S' => 
         array (
             'Source\\' => 7,
@@ -39,6 +43,10 @@ class ComposerStaticInit80e98d45efb65b4a54a9e5631eab57ba
         array (
             'League\\Plates\\' => 14,
         ),
+        'I' => 
+        array (
+            'ImageMimeTypeGuesser\\' => 21,
+        ),
         'C' => 
         array (
             'CoffeeCode\\Uploader\\' => 20,
@@ -51,6 +59,10 @@ class ComposerStaticInit80e98d45efb65b4a54a9e5631eab57ba
     );
 
     public static $prefixDirsPsr4 = array (
+        'WebPConvert\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/rosell-dk/webp-convert/src',
+        ),
         'Source\\' => 
         array (
             0 => __DIR__ . '/../..' . '/source',
@@ -70,6 +82,10 @@ class ComposerStaticInit80e98d45efb65b4a54a9e5631eab57ba
         'League\\Plates\\' => 
         array (
             0 => __DIR__ . '/..' . '/league/plates/src',
+        ),
+        'ImageMimeTypeGuesser\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/rosell-dk/image-mime-type-guesser/src',
         ),
         'CoffeeCode\\Uploader\\' => 
         array (

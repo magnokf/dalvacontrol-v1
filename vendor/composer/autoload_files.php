@@ -14,8 +14,8 @@ return array(
     'bdc465a053da7f7ddb072631f6d41d45' => $vendorDir . '/league/plates/src/Extension/LayoutSections/layout-sections.php',
     'afa76803f24616d7599be3b7b0846adc' => $vendorDir . '/league/plates/src/Extension/Folders/folders.php',
     '16c5be35e32c6cf916d875518b909210' => $vendorDir . '/league/plates/src/Util/util.php',
-    'cf2ca5af50b51f8ffa8fc0fd8b9716fd' => $baseDir . '/source/Boot/Config.php',
-    '4067677080b8d5bce02915cc6a32394c' => $baseDir . '/source/Boot/Helpers.php',
-    'a0423e6d78ae405e5251e38bd73ef171' => $baseDir . '/source/Boot/Minify/Web.php',
-    'bf72ed77a0b0d620dde74e10bda5c75b' => $baseDir . '/source/Boot/Minify/App.php',
+    'e2c955e511e5f564aa0f014c8c692a9b' => $baseDir . '/source/Boot/Config.php',
+    '49bd436aa3d368dd09f47c18258486c5' => $baseDir . '/source/Boot/Helpers.php',
+    'a0c874440c48d1d8fde53f3f62436550' => $baseDir . '/source/Boot/Minify/Web.php',
+    '7c952a5a2a5ce3f1c61dcf65702b62fd' => $baseDir . '/source/Boot/Minify/App.php',
 );
